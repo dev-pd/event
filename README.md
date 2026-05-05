@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SF Event Match
 
-## Getting Started
+Live **FunCheap SF** listings (RSS), ranked for each visitor with **OpenAI** (optional) for fit, reasons, and short hooks—plus a **deterministic fallback** if the model or key is unavailable.
 
-First, run the development server:
+- **Frontend**: Next.js App Router (`src/app/page.tsx`), preferences in **localStorage**.
+- **API**: `POST /api/events/personalized` fetches RSS server-side, then calls OpenAI or falls back to rule scoring (`src/lib/score.ts`).
+- **No database** in this version.
+
+## Environment variables
+
+Create `.env.local` (or set vars in **Vercel → Settings → Environment Variables**). **Never commit secrets.**
+
+| Variable | Required | Description |
+|----------|----------|----------------|
+| `OPENAI_API_KEY` | No* | Enables AI ranking + card copy. Without it, the app uses rule-based scoring only. |
+| `OPENAI_MODEL` | No | Defaults to `gpt-4o-mini`. |
+
+\*App works without it; quality is lower.
+
+## Local dev
 
 ```bash
+npm install
+# add OPENAI_API_KEY to .env.local if you want AI ranking
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000), pick tastes, **Save & refresh matches**.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push this repo to GitHub and import the project in Vercel.
+2. Add `OPENAI_API_KEY` (and optional `OPENAI_MODEL`) in Vercel env vars for **Production** (and Preview if you like).
+3. Deploy. No database or extra services required.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security
+
+- If an API key was ever pasted in chat, email, or a ticket, **revoke it** in the OpenAI dashboard and create a **new** key. Store it only in Vercel / local env files that are gitignored.
+
+## Legacy
+
+Older Kiloforge pipeline notes live in `docs/pipeline/` and are unrelated to this app.
