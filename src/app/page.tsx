@@ -178,7 +178,7 @@ export default function Home() {
             San Francisco &amp; Bay Area
           </p>
           <h1 className="text-balance text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
-            A shorter list of Bay events—sorted for how you actually like to go out.
+            A shortest possible list of Bay events that might interest you.
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-stone-600">
             We start from{" "}
