@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SF Event Match — personalized Bay listings",
+  title: "SF Event Match — Bay Area picks, matched to you",
   description:
-    "Ranked San Francisco and Bay Area events matched to your interests, neighborhoods, and keywords.",
+    "Free and cheap SF & Bay listings from FunCheap, ranked to your vibes and neighborhoods. No account—your taste stays on your device.",
 };
 
 export default function RootLayout({

@@ -24,7 +24,7 @@ export function EventMatchCard({ event, onSelect }: Props) {
       tabIndex={0}
       onClick={onSelect}
       onKeyDown={onKeyDown}
-      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white text-left shadow-sm ring-stone-300/0 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-2 hover:ring-orange-200/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-stone-200/90 bg-white text-left shadow-sm ring-stone-300/0 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-2 hover:ring-orange-200/60 active:scale-[0.99] active:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
     >
       <div className="relative">
         {event.imageUrl ? (
@@ -44,7 +44,7 @@ export function EventMatchCard({ event, onSelect }: Props) {
           {event.title}
         </h3>
         <p className="text-sm text-stone-500 group-hover:text-stone-600">
-          Tap for details, match reasons, and the original link
+          Open for match notes and the FunCheap link
         </p>
         {event.venueName || event.address ? (
           <p className="text-sm text-stone-600">
@@ -82,7 +82,7 @@ export function EventMatchCard({ event, onSelect }: Props) {
           </ul>
         ) : null}
         <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-orange-700/90">
-          View details
+          See why it matched
           <span aria-hidden className="transition group-hover:translate-x-0.5">
             →
           </span>

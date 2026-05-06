@@ -9,6 +9,7 @@ import {
 } from "@/lib/tags";
 import { EventDetailDialog } from "@/components/event-detail-dialog";
 import { EventMatchCard } from "@/components/event-match-card";
+import { Spinner } from "@/components/spinner";
 import { loadStoredPrefs, saveStoredPrefs } from "@/lib/prefs-storage";
 import type { MatchedCard } from "@/lib/matched-card";
 import type { UserPreferences } from "@/lib/score";
@@ -157,7 +158,7 @@ export default function Home() {
 
   const save = () => {
     if (pref.categories.length === 0) {
-      setError("Pick at least one vibe so we can match you.");
+      setError("Choose at least one vibe above—we need a starting point to rank against.");
       return;
     }
     setError(null);
@@ -172,15 +173,15 @@ export default function Home() {
   return (
     <div className="min-h-full bg-gradient-to-b from-amber-50 via-orange-50/80 to-stone-100 text-stone-900">
       <div className="mx-auto flex max-w-5xl flex-col gap-10 px-4 pb-20 pt-12 sm:px-6 lg:px-8">
-        <header className="space-y-3">
+        <header className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-700/80">
             San Francisco &amp; Bay Area
           </p>
           <h1 className="text-balance text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl">
-            Events matched to you—not another endless scroll.
+            A shorter list of Bay events—sorted for how you actually like to go out.
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-stone-600">
-            Live picks from the{" "}
+            We start from{" "}
             <a
               href="https://sf.funcheap.com/"
               className="font-medium text-orange-800 underline decoration-orange-200 underline-offset-2 hover:text-orange-900"
@@ -188,19 +189,25 @@ export default function Home() {
               rel="noopener noreferrer"
             >
               FunCheap
-            </a>{" "}
-            feed, ranked with{" "}
-            <span className="font-medium text-stone-800">OpenAI</span> for fit and copy (when{" "}
-            <code className="rounded bg-stone-200/80 px-1 text-sm">OPENAI_API_KEY</code> is set).
-            Your tastes stay in the browser (localStorage)—no account or database.
+            </a>
+            —the long-running guide to free and cheap things to do—then score what fits your vibes.
+            When AI is enabled, you also get tighter explanations and punchier hooks; otherwise you
+            still get a ranked list from the same feed.
+          </p>
+          <p className="max-w-2xl text-base leading-relaxed text-stone-500">
+            No sign-up—your interests live in{" "}
+            <span className="font-medium text-stone-600">this browser only</span>. Each refresh
+            sends your picks to rank the latest listings; we don&apos;t store a profile in a
+            database.
           </p>
         </header>
 
         <section className="rounded-2xl border border-stone-200/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-8">
           <div className="flex flex-col gap-2 border-b border-stone-100 pb-6">
-            <h2 className="text-lg font-medium text-stone-900">Your taste</h2>
+            <h2 className="text-lg font-medium text-stone-900">What sounds like you?</h2>
             <p className="text-sm text-stone-500">
-              Pick overlapping interests—more tags widen the funnel; keywords sharpen it.
+              Choose one or more vibes. More tags cast a wider net; keywords (below) narrow it to
+              the mood you want tonight.
             </p>
           </div>
 
@@ -225,8 +232,11 @@ export default function Home() {
           </div>
 
           <div className="mt-8">
-            <p className="text-sm font-medium text-stone-700">Neighborhoods &amp; nearby</p>
-            <p className="text-sm text-stone-500">Optional. Helps surface hyper-local copy.</p>
+            <p className="text-sm font-medium text-stone-700">Neighborhoods (optional)</p>
+            <p className="text-sm text-stone-500">
+              Nudge results toward parts of the city you care about—perfect if you hate crossing the
+              bridge for a weeknight.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {SF_NEIGHBORHOODS.map((n) => {
                 const active = pref.neighborhoods.includes(n);
@@ -250,12 +260,12 @@ export default function Home() {
 
           <div className="mt-8">
             <label htmlFor="kw" className="text-sm font-medium text-stone-700">
-              Keywords
+              Keywords (optional)
             </label>
             <input
               id="kw"
               className="mt-2 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-offset-2 focus:ring-2 focus:ring-orange-400/60"
-              placeholder="e.g. jazz, rooftop, fermentation, comedy cellar…"
+              placeholder="e.g. jazz, rooftop, no cover, comedy, farmers market…"
               value={pref.keywords}
               onChange={(e) =>
                 setPref((p) => ({ ...p, keywords: e.target.value.slice(0, 200) }))
@@ -273,39 +283,54 @@ export default function Home() {
             type="button"
             onClick={save}
             disabled={saving}
-            className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-stone-900 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:opacity-50 sm:w-auto sm:px-10"
+            aria-busy={saving}
+            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-stone-900 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:opacity-80 sm:w-auto sm:px-10"
           >
-            {saving ? "Fetching & ranking…" : "Save & refresh matches"}
+            {saving ? (
+              <>
+                <Spinner size="sm" className="text-white" />
+                <span>Pulling feed &amp; ranking…</span>
+              </>
+            ) : (
+              "Update my matches"
+            )}
           </button>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4" aria-busy={saving}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-stone-900">Your matches</h2>
+              <h2 className="text-xl font-semibold text-stone-900">Your shortlist</h2>
               <p className="text-sm text-stone-500">
-                Click a card for the full write-up and why it matched. Links go to the original
-                listing.
+                Open any card for the full blurb, why it landed for you, and a link out to the
+                original FunCheap listing.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-sm text-stone-600">
               <span className="rounded-full bg-white px-3 py-1 shadow-sm ring-1 ring-stone-200/80">
-                <strong className="text-stone-900">{matchedCount}</strong> matched
+                <strong className="text-stone-900">{matchedCount}</strong> strong fits
               </span>
               <span className="rounded-full bg-white px-3 py-1 shadow-sm ring-1 ring-stone-200/80">
-                <strong className="text-stone-900">{totalCandidates}</strong> in date window
+                <strong className="text-stone-900">{totalCandidates}</strong> listings in range
               </span>
               {meta ? (
                 <span
                   className={`rounded-full px-3 py-1 shadow-sm ring-1 ring-stone-200/80 ${
                     meta.usedOpenAI ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-900"
                   }`}
+                  title={
+                    meta.usedOpenAI
+                      ? "Ranked and summarized with AI."
+                      : meta.hasOpenAIKey
+                        ? "Used rule-based ranking this run; AI output was unavailable."
+                        : "Ranked with your rules; add an OpenAI API key on the server for richer copy."
+                  }
                 >
                   {meta.usedOpenAI
-                    ? "AI-ranked + copy"
+                    ? "AI-tuned summaries"
                     : meta.hasOpenAIKey
-                      ? "Rules-based (AI parse failed)"
-                      : "Rules-based — add OPENAI_API_KEY on Vercel"}
+                      ? "Classic ranking this run"
+                      : "Classic ranking"}
                 </span>
               ) : null}
             </div>
@@ -323,42 +348,74 @@ export default function Home() {
           {needsPreferences ? (
             <div className="rounded-2xl border border-dashed border-stone-300 bg-white/60 p-8 text-center">
               <p className="text-base font-medium text-stone-700">
-                Set your taste above—we&apos;ll pull fresh FunCheap listings and rank them for you.
+                Tell us what you&apos;re into above—then we&apos;ll hit the feed and build your first
+                shortlist.
               </p>
               <p className="mt-2 text-sm text-stone-500">
-                Tip: start with <em>music + food + nightlife</em>, then refine with keywords like
-                &quot;jazz&quot; or &quot;free&quot;.
+                Not sure where to start? Try <em>music + food + arts</em>, then add keywords like
+                &quot;jazz&quot;, &quot;free&quot;, or &quot;outdoor.&quot;
               </p>
             </div>
           ) : saving && items.length === 0 ? (
-            <div className="rounded-2xl border border-stone-200 bg-white/80 p-12 text-center text-stone-600">
-              Loading public events and ranking…
+            <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-stone-200 bg-white/80 p-12 text-center text-stone-600">
+              <Spinner size="lg" className="text-orange-600" />
+              <p className="text-base font-medium text-stone-700">
+                Scanning the latest listings and scoring them for you…
+              </p>
             </div>
           ) : items.length === 0 ? (
             <div className="rounded-2xl border border-stone-200 bg-white/80 p-8 text-center">
               <p className="text-stone-700">
-                Nothing in this window matched strongly—try broader tags, fewer neighborhood filters,
-                or different keywords. The live feed also changes throughout the week.
+                Nothing scored high enough yet—try adding a vibe or two, loosening neighborhoods, or
+                swapping keywords. The feed refreshes often, so it&apos;s worth another pass later
+                this week.
               </p>
             </div>
           ) : (
-            <ul className="grid gap-5 sm:grid-cols-2">
-              {items.map((ev) => (
-                <li key={ev.id}>
-                  <EventMatchCard event={ev} onSelect={() => setSelectedEvent(ev)} />
-                </li>
-              ))}
-            </ul>
+            <div className="relative">
+              {saving ? (
+                <div
+                  className="absolute inset-0 z-10 flex min-h-[12rem] items-center justify-center rounded-2xl bg-white/75 backdrop-blur-[2px]"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="flex flex-col items-center gap-3 rounded-2xl border border-stone-200/80 bg-white/95 px-8 py-6 shadow-lg">
+                    <Spinner size="lg" className="text-orange-600" />
+                    <p className="text-sm font-medium text-stone-800">Updating your shortlist…</p>
+                    <p className="max-w-xs text-center text-xs text-stone-500">
+                      Grabbing the newest posts from the feed and re-scoring with your latest picks.
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+              <ul
+                className={`grid gap-5 sm:grid-cols-2 ${saving ? "pointer-events-none select-none opacity-50" : ""}`}
+              >
+                {items.map((ev) => (
+                  <li key={ev.id}>
+                    <EventMatchCard event={ev} onSelect={() => setSelectedEvent(ev)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </section>
 
         <footer className="border-t border-stone-200/80 pt-8 text-center text-xs leading-relaxed text-stone-500">
-          Data © listing authors / FunCheap. This app aggregates and personalizes; always confirm
-          details on the source page.
+          Event copy and details belong to their publishers and{" "}
+          <a
+            href="https://sf.funcheap.com/"
+            className="font-medium text-stone-600 underline decoration-stone-300 underline-offset-2 hover:text-stone-800"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            FunCheap
+          </a>
+          . Double-check times, prices, and tickets on the original listing before you head out.
           {meta ? (
             <>
               {" "}
-              Raw feed items this run: <strong>{meta.rawFeedCount}</strong>.
+              This refresh pulled <strong>{meta.rawFeedCount}</strong> items from the feed.
             </>
           ) : null}
         </footer>
