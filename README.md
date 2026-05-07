@@ -1,4 +1,4 @@
-# SF Event Match
+# SF Event Match --- NOTE: This was built in 30 mins as part of a challenge for a startup. Idea -> Build -> Deploy.
 
 Live **FunCheap SF** listings (RSS), ranked for each visitor with **OpenAI** (optional) for fit, reasons, and short hooks—plus a **deterministic fallback** if the model or key is unavailable.
 
